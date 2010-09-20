@@ -2,8 +2,8 @@
 
 $lang = array(
 
-	'ldap_host'                 => 'Server Address (e.g. ldap://myhost)',
-	'ldap_port'                 => 'Port number (default = 389)',
+	'ldap_host'                 => 'Server Address [e.g. ldap://myhost] (comma separate for multiple servers)',
+	'ldap_port'                 => 'Port number [default = 389]',
 	'ldap_search_base'          => 'Search base',
 	'ldap_search_user'          => 'LDAP user (leave blank for anonymous binding)',
 	'ldap_search_password'      => 'LDAP password (leave blank for anonymous binding)',

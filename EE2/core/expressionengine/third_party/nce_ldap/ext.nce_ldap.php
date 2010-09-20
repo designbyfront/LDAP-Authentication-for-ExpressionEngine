@@ -19,10 +19,13 @@
  * @author  Alistair Brown 
  * @author  Alex Glover
  * @link    http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine
- * @since   Version 0.1
+ * @since   Version 1.2
+ *
+ * LDAPS Instructions - http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine/issues/closed#issue/1
  *
  * Enhancements to original:
  *  - Upgraded to EE2
+ *  - Authentication against multiple LDAP servers
  *  - Non-LDAP user login (remove restriction)
  *  - Authentication even with LDAP server downtime (remove restriction)
  *  - Use EE global classes (rather then PHP global variables)
@@ -31,7 +34,7 @@
  *  - More settings control:
  *     -> Custom admin email message
  *  - Notifications:
- *     Adds to session data $_SESSION['messages']['LDAP Authentication'] which can be used later for notification purposes
+ *     Adds to session data $_SESSION['ldap_message'] which can be used later for notification purposes
  *  - Use of character encoding for sent data (and ability to change in settings)
  *     PHP uses 'UTF-8' encoding; Windows server uses 'Windows-1252' encoding.
  *     Using the iconv PHP module, settings data saved in 'UTF-8' is dynamically encoded to 'Windows-1252' when being sent.
@@ -42,10 +45,10 @@ class Nce_ldap_ext {
 
 	var $settings       = array();
 	var $name           = 'LDAP authentication';
-	var $version        = '1.1.0';
+	var $version        = '1.2';
 	var $description    = 'Handles LDAP login / account creation';
 	var $settings_exist = 'y';
-	var $docs_url       = 'http://github.com/designbyfront/ZenDesk-Dropbox-for-ExpressionEngine/issues';
+	var $docs_url       = 'http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine/issues';
 	var $debug          = FALSE;
 
 // If you are looking here to edit the settings, you can always just change them in Extensions settings page :)
@@ -59,7 +62,7 @@ class Nce_ldap_ext {
 	var $ldap_search_base          = 'ldap_search_base'; // Change to your LDAP search base
 	var $ldap_search_user          = 'ldap_search_user'; // Change to your LDAP search user
 	var $ldap_search_password      = 'ldap_search_password'; // Change to your LDAP search password
-	var $ldap_username_attribute   = 'ldap_username'; // Change to your LDAP username
+	var $ldap_username_attribute   = 'ldap_username_attribute'; // Change to your LDAP username attribute
 	var $ldap_character_encode     = 'Windows-1252';
 	var $no_ldap_login_message     = 'LDAP authentication seems to be down at the moment. Please contact your administrator.';
 	var $first_time_login_message  = 'This is your first time logging in! Your account has been automatically created for you, but your administrator may still need to alter your settings. Please contact them if you require more access.';
@@ -163,8 +166,8 @@ class Nce_ldap_ext {
 		$settings['ldap_username_attribute']   = $this->ldap_username_attribute;
 		$settings['ldap_character_encode']     = $this->ldap_character_encode;
 		$settings['use_ldap_account_creation'] = array('r', array('yes' => 'yes_ldap_account_creation',
-                                                               'no'  => 'no_ldap_account_creation'),
-                                                    'yes');
+		                                                           'no'  => 'no_ldap_account_creation'),
+		                                                'yes');
 		$settings['admin_email']               = $this->admin_email;
 		$settings['from_email']                = $this->from_email;
 		$settings['mail_host']                 = $this->mail_host;
@@ -199,8 +202,15 @@ class Nce_ldap_ext {
 		$provided_username = $this->EE->input->post('username');
 		$provided_password = $this->EE->input->post('password');
 
-		$connection = $this->create_connection();
-		$result = $this->authenticate_user($connection, $provided_username, $provided_password);
+		// Multiple LDAP servers
+		$ldap_hosts = explode(',', $this->settings['ldap_host']);
+		foreach ($ldap_hosts as $ldap_host)
+		{
+			$connection = $this->create_connection($ldap_host, $this->settings['ldap_port'], $this->settings['ldap_search_user'], $this->settings['ldap_search_password']);
+			$result = $this->authenticate_user($connection, $provided_username, $provided_password, $this->settings['ldap_username_attribute'], $this->settings['ldap_search_base']);
+			if ($result['authenticated'])
+				break;
+		}
 
 		if ($this->debug)
 		{
@@ -311,11 +321,11 @@ class Nce_ldap_ext {
 // ----------------------
 
 
-	function authenticate_user($conn, $username, $password)
+	function authenticate_user($conn, $username, $password, $ldap_username_attribute, $ldap_search_base)
 	{
-		$this->debug_print('Searching for attribute '.$this->settings['ldap_username_attribute'].'='.$username.' ...');
+		$this->debug_print('Searching for attribute '.$ldap_username_attribute.'='.$username.' ...');
 		// Search username entry
-		$result = ldap_search($conn, $this->settings['ldap_search_base'], $this->settings['ldap_username_attribute'].'='.$username);
+		$result = ldap_search($conn, $ldap_search_base, $ldap_username_attribute.'='.$username);
 		$this->debug_print('Search result is: '.$result);
 
 		// Search not successful (server down?), so do nothing - standard MySQL authentication can take over
@@ -356,23 +366,23 @@ class Nce_ldap_ext {
 // ----------------------
 
 
-	function create_connection()
+	function create_connection($ldap_host, $ldap_port, $ldap_search_user, $ldap_search_password)
 	{
 		$this->debug_print('Connecting to LDAP...');
-		$conn = ldap_connect($this->settings['ldap_host'], $this->settings['ldap_port']) or
-			die('Could not connect to host: '.$this->settings['ldap_host'].':'.$this->settings['ldap_port'].'<br/>'."\n");
+		$conn = ldap_connect($ldap_host, $ldap_port) or
+			die('Could not connect to host: '.$ldap_host.':'.$ldap_port.'<br/>'."\n");
 		$this->debug_print('connect result is '.$conn);
 
 		// Perform bind with search user
-		if (empty($this->settings['ldap_search_user']))
+		if (empty($ldap_search_user))
 		{
 			$this->debug_print('Binding anonymously...');
 			$success = ldap_bind($conn); // this is an "anonymous" bind, typically read-only access
 		}
 		else
 		{
-			$this->debug_print('Binding with user: ['.$this->settings['ldap_search_user'].']-['.$this->settings['ldap_search_password'].'] ...'); 
-			$success = ldap_bind($conn, $this->ldap_encode($this->ldap_search_user), $this->ldap_encode($this->ldap_search_password)); // bind with credentials
+			$this->debug_print('Binding with user: ['.$ldap_search_user.']-['.$ldap_search_password.'] ...');
+			$success = ldap_bind($conn, $this->ldap_encode($ldap_search_user), $this->ldap_encode($ldap_search_password)); // bind with credentials
 		}
 		$this->debug_print('Bind result is '.$success);
 		return $conn;
