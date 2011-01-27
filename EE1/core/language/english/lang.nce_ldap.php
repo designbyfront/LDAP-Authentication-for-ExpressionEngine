@@ -10,6 +10,7 @@ $L = array(
 	'ldap_username_attribute'   => 'Attribute in the directory to identify your users',
 	'ldap_character_encode'     => 'LDAP encoding type',
 	'use_ldap_account_creation' => 'Use LDAP for account creation',
+	'created_user_group'        => 'Group ID to assign newly created users',
 
 	'admin_email'  => 'Address to send system notifications (e.g. when new user regsitered via LDAP)',
 	'from_email'   => 'System notifications will appear to be from',

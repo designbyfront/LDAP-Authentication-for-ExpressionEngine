@@ -19,7 +19,7 @@
  * @author  Alistair Brown 
  * @author  Alex Glover
  * @link    http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine
- * @since   Version 1.2
+ * @since   Version 1.3
  *
  * LDAPS Instructions - http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine/issues/closed#issue/1
  *
@@ -45,7 +45,7 @@ class Nce_ldap {
 
 	var $settings       = array();
 	var $name           = 'LDAP authentication';
-	var $version        = '1.2';
+	var $version        = '1.3';
 	var $description    = 'Handles LDAP login / account creation';
 	var $settings_exist = 'y';
 	var $docs_url       = 'http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine/issues';
@@ -66,6 +66,7 @@ class Nce_ldap {
 	var $ldap_character_encode     = 'Windows-1252';
 	var $no_ldap_login_message     = 'LDAP authentication seems to be down at the moment. Please contact your administrator.';
 	var $first_time_login_message  = 'This is your first time logging in! Your account has been automatically created for you, but your administrator may still need to alter your settings. Please contact them if you require more access.';
+	var $created_user_group        = '5'; // User group id (members)
 
 	// PHP4 Constructor
 	function Nce_ldap($settings = '')
@@ -99,6 +100,7 @@ class Nce_ldap {
 		$settings['ldap_character_encode']     = $this->ldap_character_encode;
 		$settings['no_ldap_login_message']     = $this->no_ldap_login_message;
 		$settings['first_time_login_message']  = $this->first_time_login_message;
+		$settings['created_user_group']        = $this->created_user_group;
 
 		$hooks = array(
 			'login_authenticate_start'  => 'login_authenticate_start',
@@ -179,6 +181,7 @@ class Nce_ldap {
 		$settings['mail_message']              = array('t', $this->mail_message);
 		$settings['no_ldap_login_message']     = array('t', $this->no_ldap_login_message);
 		$settings['first_time_login_message']  = array('t', $this->first_time_login_message);
+		$settings['created_user_group']        = $this->created_user_group;
 
 		return $settings;
 	}
@@ -284,7 +287,7 @@ class Nce_ldap {
 						 'username = \''.$DB->escape_str($user_info['username']).'\', '.
 						 'password = \''.$DB->escape_str($encrypted_password).'\', '.
 						 'unique_id = \''.$DB->escape_str($unique_id).'\', '.
-						 'group_id = \'6\', '.
+						 'group_id = \''.$DB->escape_str($this->settings['created_user_group']).'\', '.
 						 'screen_name = \''.$DB->escape_str($user_info['cn'][0]).'\', '.
 						 'email = \''.$DB->escape_str($user_info['mail'][0]).'\', '.
 						 'ip_address = \'0.0.0.0\', '.
