@@ -291,7 +291,7 @@ class Nce_ldap_ext {
 			$member_id = $this->EE->member_model->create_member($data);
 			if ($member_id > 0) // update other relevant fields
 			{
-				$sql = 'UPDATE exp_members SET photo_filename = \'photo_'.$member_id.'.jpg\', photo_width = \'90\', photo_height = \'120\'';
+				$sql = 'UPDATE exp_members SET photo_filename = \'photo_'.$member_id.'.jpg\', photo_width = \'90\', photo_height = \'120\' WHERE member_id ='.$member_id;
 				$query = $this->EE->db->query($sql);
 
 				//$this->EE->db->query('INSERT INTO exp_member_data SET member_id = '.$this->EE->db->escape_str($member_id));
