@@ -281,8 +281,7 @@ class Nce_ldap_ext {
 			$data['join_date']        = $this->EE->localize->now;
 			$data['language']         = 'english';
 			$data['timezone']         = 'UTC';
-			$data['daylight_savings'] = 'n';
-			$data['time_format']      = 'eu';
+			$data['time_format']      = '12';
 			$data['group_id']         = $this->settings['created_user_group'];
 
 			$this->debug_print('Inserting user with data: '.print_r($data, TRUE));
