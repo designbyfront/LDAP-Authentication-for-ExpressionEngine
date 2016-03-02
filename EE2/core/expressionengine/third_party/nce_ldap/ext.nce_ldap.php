@@ -16,7 +16,7 @@
  * Dependancy: iconv PHP module
  *
  * @package DesignByFront
- * @author  Alistair Brown 
+ * @author  Alistair Brown
  * @author  Alex Glover
  * @link    http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine
  * @since   Version 1.3
@@ -307,7 +307,7 @@ class Nce_ldap_ext {
 				$headers = 'From: '.$this->settings['from_email']."\r\n" .
 									 'X-Mailer: PHP/' . phpversion();
 				$success = mail(
-													$this->settings['admin_email'], 
+													$this->settings['admin_email'],
 													'New member \''.$user_info['username'].'\' on http://'.$_SERVER['HTTP_HOST'],
 													$this->settings['mail_message'],
 													$headers
@@ -357,7 +357,7 @@ class Nce_ldap_ext {
 		$dn = $user_info['dn'];
 		$success = @ldap_bind($conn, $dn, $this->ldap_encode($password)); // bind with user credentials
 
-		if (!$success) 
+		if (!$success)
 		{
 			$this->debug_print('Error binding with supplied password (dn: '.$dn.') ERROR: '.ldap_error($conn));
 		}
