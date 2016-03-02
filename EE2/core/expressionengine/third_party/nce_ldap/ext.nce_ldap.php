@@ -274,6 +274,7 @@ class Nce_ldap_ext {
 			$data['screen_name']      = $user_info['cn'][0];
 			$data['username']         = $user_info['username'];
 			$data['password']         = $encrypted_password;
+			$data['crypt_key']        = ee()->functions->random('encrypt', 16);
 			$data['email']            = $user_info['mail'][0];
 			$data['ip_address']       = '0.0.0.0';
 			$data['unique_id']        = $this->EE->functions->random('encrypt');
