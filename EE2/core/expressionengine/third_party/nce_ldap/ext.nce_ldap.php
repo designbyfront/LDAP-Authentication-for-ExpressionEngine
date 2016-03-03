@@ -16,7 +16,7 @@
  * Dependancy: iconv PHP module
  *
  * @package DesignByFront
- * @author  Alistair Brown 
+ * @author  Alistair Brown
  * @author  Alex Glover
  * @link    http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine
  * @since   Version 1.3
@@ -243,7 +243,7 @@ class Nce_ldap_ext {
 	function sync_user_details($user_info)
 	{
 			// Sync EE password to match LDAP (if account exists)
-			$encrypted_password = $this->EE->functions->hash(stripslashes($user_info['password']));
+			$encrypted_password = hash('sha1', stripslashes($user_info['password']));
 			$sql = 'UPDATE exp_members SET password = \''.$this->EE->db->escape_str($encrypted_password).'\' WHERE username = \''.$this->EE->db->escape_str($user_info['username']).'\'';
 			$this->debug_print('Updating user with SQL: '.$sql);
 			$this->EE->db->query($sql);
@@ -274,14 +274,14 @@ class Nce_ldap_ext {
 			$data['screen_name']      = $user_info['cn'][0];
 			$data['username']         = $user_info['username'];
 			$data['password']         = $encrypted_password;
+			$data['crypt_key']        = ee()->functions->random('encrypt', 16);
 			$data['email']            = $user_info['mail'][0];
 			$data['ip_address']       = '0.0.0.0';
 			$data['unique_id']        = $this->EE->functions->random('encrypt');
 			$data['join_date']        = $this->EE->localize->now;
 			$data['language']         = 'english';
 			$data['timezone']         = 'UTC';
-			$data['daylight_savings'] = 'n';
-			$data['time_format']      = 'eu';
+			$data['time_format']      = '12';
 			$data['group_id']         = $this->settings['created_user_group'];
 
 			$this->debug_print('Inserting user with data: '.print_r($data, TRUE));
@@ -307,7 +307,7 @@ class Nce_ldap_ext {
 				$headers = 'From: '.$this->settings['from_email']."\r\n" .
 									 'X-Mailer: PHP/' . phpversion();
 				$success = mail(
-													$this->settings['admin_email'], 
+													$this->settings['admin_email'],
 													'New member \''.$user_info['username'].'\' on http://'.$_SERVER['HTTP_HOST'],
 													$this->settings['mail_message'],
 													$headers
@@ -357,7 +357,7 @@ class Nce_ldap_ext {
 		$dn = $user_info['dn'];
 		$success = @ldap_bind($conn, $dn, $this->ldap_encode($password)); // bind with user credentials
 
-		if (!$success) 
+		if (!$success)
 		{
 			$this->debug_print('Error binding with supplied password (dn: '.$dn.') ERROR: '.ldap_error($conn));
 		}
