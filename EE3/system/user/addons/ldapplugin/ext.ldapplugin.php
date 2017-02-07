@@ -25,6 +25,7 @@
  * LDAPS Instructions - http://github.com/designbyfront/LDAP-Authentication-for-ExpressionEngine/issues/closed#issue/1
  *
  * Enhancements to original:
+ *  - Upgraded to EE3 (by @jimmy0x52 at @HoeflerCo)
  *  - Upgraded to EE2
  *  - Authentication against multiple LDAP servers
  *  - Non-LDAP user login (remove restriction)
