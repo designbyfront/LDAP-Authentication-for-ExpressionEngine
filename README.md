@@ -32,3 +32,5 @@ Useful, memorable and satisfying things for the web<br />
 We create amazing online experiences that delight users and help our clients grow.
 
 [Web Design](http://www.designbyfront.com) by Front
+
+Plugin updated to work with EE3 by Hoefler & Co.
