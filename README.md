@@ -1,11 +1,11 @@
 ##  LDAP Authentication for ExpressionEngine ##
 An ExpressionEngine Extension that allows the authentication of users via LDAP. LDAP details are copied to the EE database before standard MySQL authentication is performed. If user is not found on LDAP, MySQL authentication will still be performed (useful for EE users not in LDAP).
 
-Available in both EE1 and EE2 versions.
+Available in both EE1, EE2 and EE3 versions.
 
 ## Installation ##
 
-Choose EE1 or EE2 (depending on your installation).<br />
+Choose EE1, EE2 or EE3 (depending on your installation).<br />
 Use the structure provided to place the files within your current EE installation.<br />
 Enable the extension in your EE control panel.
 
@@ -32,3 +32,5 @@ Useful, memorable and satisfying things for the web<br />
 We create amazing online experiences that delight users and help our clients grow.
 
 [Web Design](http://www.designbyfront.com) by Front
+
+Plugin updated to work with EE3 by [Hoefler & Co](http://www.typography.com).
