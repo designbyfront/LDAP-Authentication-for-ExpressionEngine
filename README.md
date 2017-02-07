@@ -33,4 +33,4 @@ We create amazing online experiences that delight users and help our clients gro
 
 [Web Design](http://www.designbyfront.com) by Front
 
-Plugin updated to work with EE3 by Hoefler & Co.
+Plugin updated to work with EE3 by [Hoefler & Co](http://www.typography.com).
